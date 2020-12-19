@@ -106,7 +106,7 @@ resource "aws_autoscaling_group" "asg" {
   max_size = 2
   min_size = 2
   vpc_zone_identifier = var.constants.subnets
-  load_balancers = [ aws_lb.loadbalancer.id ]
+  target_group_arns = [ aws_lb_target_group.tg.arn ]
   launch_template {
     id = aws_launch_template.template.id
     version = "$Latest"
