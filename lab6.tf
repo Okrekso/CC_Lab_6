@@ -12,7 +12,7 @@ variable constants {
 
   default = {
     vpc_id = "vpc-0c26c15ad6346113d"
-    subnets = ["subnet-023091a074f60a83b", "subnet-02b8d57b7c6dc0be3"]
+    subnets = ["subnet-0cd2d6259ea6394b7", "subnet-0d55506aabf8acc5c"]
     ami_id = "ami-018c04d38c8fc4bb9"
   }
 }
@@ -86,13 +86,26 @@ resource "aws_launch_template" "template" {
   image_id = var.constants.ami_id
   name_prefix = "lab6"
   instance_type = "t2.micro"
+  key_name = "lab3keypair"
+  # vpc_security_group_ids = [var.constants.vpc_id]
+  
+
+  network_interfaces {
+    associate_public_ip_address = true
+    subnet_id = var.constants.subnets[0]
+    security_groups = [ aws_security_group.this_security_group.id ]
+  }
+
+  placement {
+    availability_zone = "us-west-2a"
+  }
 }
 
 resource "aws_autoscaling_group" "asg" {
-  availability_zones = [ "us-west-2a" ]
   desired_capacity = 2
   max_size = 2
   min_size = 2
+  vpc_zone_identifier = var.constants.subnets
   launch_template {
     id = aws_launch_template.template.id
     version = "$Latest"
