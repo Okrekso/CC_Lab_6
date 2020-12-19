@@ -44,17 +44,17 @@ resource "aws_lb" "loadbalancer" {
   subnets = var.constants.subnets
 }
 
-resource "aws_instance" "instances" {
-    ami = var.constants.ami_id
-    instance_type = "t2.micro"
-    key_name = "lab3keypair"
-    count = 2
-    security_groups = [aws_security_group.this_security_group.id]
-    associate_public_ip_address = true
-    tags = {
-      Name = format("lab6-i-%d", count.index)
-    }
-}
+# resource "aws_instance" "instances" {
+#     ami = var.constants.ami_id
+#     instance_type = "t2.micro"
+#     key_name = "lab3keypair"
+#     count = 2
+#     security_groups = [aws_security_group.this_security_group.id]
+#     associate_public_ip_address = true
+#     tags = {
+#       Name = format("lab6-i-%d", count.index)
+#     }
+# }
 
 resource "aws_lb_target_group" "tg" {
   name = "for-Lab6"
@@ -64,12 +64,12 @@ resource "aws_lb_target_group" "tg" {
   vpc_id = var.constants.vpc_id
 }
 
-resource "aws_lb_target_group_attachment" "tg_attachment" {
-  target_group_arn = aws_lb_target_group.tg.arn
-  count = length(aws_instance.instances)
-  target_id = aws_instance.instances[count.index].id
-  port = 80
-}
+# resource "aws_lb_target_group_attachment" "tg_attachment" {
+#   target_group_arn = aws_lb_target_group.tg.arn
+#   count = length(aws_instance.instances)
+#   target_id = aws_instance.instances[count.index].id
+#   port = 80
+# }
 
 resource "aws_lb_listener" "http_listiner" {
   load_balancer_arn = aws_lb.loadbalancer.arn
@@ -106,6 +106,7 @@ resource "aws_autoscaling_group" "asg" {
   max_size = 2
   min_size = 2
   vpc_zone_identifier = var.constants.subnets
+  load_balancers = [ aws_lb.loadbalancer.id ]
   launch_template {
     id = aws_launch_template.template.id
     version = "$Latest"
